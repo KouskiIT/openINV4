@@ -19,8 +19,8 @@
 
 ### 4. Vite Import Error Fixed (CRITICAL)
 - **Problem**: `Cannot find package 'vite'` in production build
-- **Solution**: Added vite and related plugins to external dependencies in esbuild
-- **Result**: Production build no longer tries to import vite at runtime
+- **Solution**: Created production-safe vite.js wrapper with dynamic imports and externalized from build
+- **Result**: Production build properly externalizes vite dependencies and copies runtime file
 
 ## 📋 Current Configuration
 
@@ -50,9 +50,16 @@
 4. Run esbuild (backend) with external vite dependencies
 5. Start with `npm start`
 
-### Fixed Build Command
+### Fixed Build Commands
 ```bash
-npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --external:vite --external:@vitejs/plugin-react --external:@replit/vite-plugin-runtime-error-modal --external:@replit/vite-plugin-cartographer
+# Frontend build
+npx vite build
+
+# Backend build with external vite module
+npx esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist --external:./vite.js
+
+# Copy vite runtime module
+cp server/vite.js dist/vite.js
 ```
 
 ## 🔧 Deployment Steps
